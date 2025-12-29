@@ -205,7 +205,7 @@ class AutoTradingBot {
     }
 
     private async connectSoftwareWebSocket() {
-        const url = process.env.SOFTWARE_WS_URL || 'ws://45.130.166.119:5001';
+        const url = process.env.SOFTWARE_WS_URL;
         let reconnectAttempts = 0;
         const maxReconnectAttempts = 10;
         const baseReconnectDelay = 5000; // 5 seconds
