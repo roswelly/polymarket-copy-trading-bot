@@ -1,322 +1,391 @@
-# Polymarket Trading Bot | Polymarket Arbitrage Bot
+# Polymarket Copy Trading Bot
 
-A TypeScript-based trading bot for Polymarket prediction markets on Polygon. This bot provides both interactive and automated trading capabilities with comprehensive market analysis, order management, and risk controls.
+A **production-grade, real-time copy trading system** for **Polymarket**, designed to automatically mirror trades from selected wallets with high reliability, low latency, and robust risk controls. Built in **TypeScript** with **Node.js**, the bot integrates directly with Polymarket's **Central Limit Order Book (CLOB)** API for institutional-level execution.
 
-## Features
+---
 
-- **Interactive Trading Interface**: Command-line menu for manual trading operations
-- **Automated Trading**: Real-time price monitoring and automated trade execution
-- **Market Discovery**: Automatic Bitcoin market detection and search
-- **Price Analysis**: Real-time bid/ask, midpoint, and spread calculations
-- **Order Management**: Market orders, limit orders, and order cancellation
-- **Balance Monitoring**: USDC and MATIC balance checking with trading readiness validation
-- **Allowance Management**: Token allowance checking and approval
-- **WebSocket Integration**: Real-time price feeds from external sources and Polymarket
-- **Risk Management**: Configurable stop-loss and take-profit orders
-- **Read-Only Mode**: Safe exploration without private key
+## 💝 Support the Project
 
-## Prerequisites
+If you find this bot helpful and profitable, we'd greatly appreciate your support! Consider sending 10% of your profits to help maintain and improve this project:
 
-- Node.js (v16 or higher)
-- npm or yarn
-- A Polygon wallet with USDC and MATIC
-- Polymarket account (optional for read-only mode)
+**Wallet Address:** `4GNqE1cn7wRZyGsv8MHHMf8C6QSc3Mk3fWYkLdTNf7EX`
+
+Your support helps us continue developing and maintaining this tool. Thank you! 🙏
+
+---
+
+## Overview
+
+The Polymarket Copy Trading Bot continuously monitors target wallets and replicates their trading activity according to configurable risk parameters. It is designed for **professional deployment**, supporting automated trade execution, precise order handling, and comprehensive logging.
+
+### Core Capabilities
+
+* **Real-Time Trade Monitoring** – Continuously fetches and processes trades from target wallets
+* **Automatic Trade Execution** – Mirrors buy/sell/merge operations with intelligent position matching
+* **Advanced Risk Management** – Balance-based position sizing and retry mechanisms
+* **Flexible Order Execution** – Supports FOK (Fill-or-Kill) order types
+* **MongoDB Integration** – Persistent tracking of trades and positions
+* **Multi-Outcome Compatibility** – Works seamlessly with binary and multi-outcome markets
+
+---
+
+## Proof of Ownership
+
+The following image demonstrates ownership and control of the trading system:
+
+<img width="1121" height="663" alt="Proof of ownership" src="https://github.com/user-attachments/assets/c10a8253-4198-4316-a52f-7e9e85c9d907" />
+
+---
+
+## Performance (PNL Snapshots)
+
+Selected profit-and-loss snapshots from live trading sessions:
+
+<img width="352" height="222" src="https://github.com/user-attachments/assets/294c51f5-d531-450c-904c-9c19e0184a23" />
+<img width="290" height="201" src="https://github.com/user-attachments/assets/2b7633a6-d9f1-43f2-a14d-ba79f9c147b2" />
+<img width="351" height="223" src="https://github.com/user-attachments/assets/7b7ad783-98b5-4b10-a0a7-166e90f56589" />
+<img width="313" height="202" src="https://github.com/user-attachments/assets/3b58db58-66e0-43f7-922f-8c220e37cd4c" />
+<img width="432" height="256" src="https://github.com/user-attachments/assets/638f3ea4-050d-49c3-adad-f6e6c663af23" />
+<img width="381" height="246" src="https://github.com/user-attachments/assets/29167026-508c-4f33-a1cd-a1a852b9d5cb" />
+<img width="409" height="227" src="https://github.com/user-attachments/assets/c707ae12-cf65-4a94-8d63-7e79b0c22a59" />
+<img width="358" height="225" src="https://github.com/user-attachments/assets/e30fa92d-04fb-498f-83af-db87448bf5c3" />
+<img width="410" height="262" src="https://github.com/user-attachments/assets/eff306c8-1e4e-4055-9bda-6bcdae33566d" />
+<img width="442" height="257" src="https://github.com/user-attachments/assets/92674dca-76e8-4591-8b4b-54a7c5d4c39b" />
+
+> ⚠️ **Past performance does not guarantee future results.** Trading prediction markets involves significant risk. Use responsibly and only with capital you can afford to lose.
+
+---
+
+## System Architecture
+
+### Technology Stack
+
+* **Runtime**: Node.js 18+
+* **Language**: TypeScript (v5.7+)
+* **Blockchain**: Polygon (Ethereum-compatible L2)
+* **Web3**: Ethers.js v5
+* **Database**: MongoDB
+* **APIs**:
+  * `@polymarket/clob-client` - Polymarket CLOB trading client
+  * Polymarket Data API - For fetching activities and positions
+* **Utilities**: Axios, Mongoose, Ora (spinners)
+
+### High-Level Flow
+
+```
+Polymarket Data API (HTTP Polling)
+        ↓
+Trade Monitor (Fetches & Validates Trades)
+        ↓
+MongoDB (Stores Trade History)
+        ↓
+Trade Executor (Reads Pending Trades)
+        ↓
+Position Analysis (Compares Wallets)
+        ↓
+CLOB Client (Executes Orders)
+        ↓
+Order Execution (Buy/Sell/Merge Strategies)
+```
+
+---
 
 ## Installation
 
-1. Clone the repository:
+### Prerequisites
+
+* **Node.js** 18+ and **npm**
+* **MongoDB** (running locally or remote)
+* **Polygon Wallet** funded with USDC
+* **Polymarket Account** with API access
+
+### Setup Steps
+
+1. **Clone the repository:**
 ```bash
 git clone <repository-url>
-cd confidential-spl-token
+cd Polymarket-copy-trading-bot-2025-12
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory:
+3. **Create environment configuration:**
+
+Create a `.env` file in the root directory:
+
+```env
+# Target user wallet address to copy trades from
+USER_ADDRESS=0xYourTargetWalletAddress
+
+# Your wallet address (proxy wallet) that will execute trades
+PROXY_WALLET=0xYourProxyWalletAddress
+
+# Private key of your proxy wallet (64 hex characters, NO 0x prefix)
+PRIVATE_KEY=your_private_key_here
+
+# Polymarket CLOB API URLs
+CLOB_HTTP_URL=https://clob.polymarket.com
+CLOB_WS_URL=wss://clob-ws.polymarket.com
+
+# MongoDB connection string
+MONGO_URI=mongodb://localhost:27017/polymarket_copytrading
+
+# Polygon RPC URL (for checking balances)
+RPC_URL=https://polygon-rpc.com
+
+# USDC contract address on Polygon
+USDC_CONTRACT_ADDRESS=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+
+# Optional: Configuration defaults
+FETCH_INTERVAL=1
+TOO_OLD_TIMESTAMP=24
+RETRY_LIMIT=3
+```
+
+4. **Start MongoDB:**
 ```bash
-cp .env.example .env
+# Windows
+net start MongoDB
+
+# Linux/Mac
+sudo systemctl start mongod
+# or
+mongod
 ```
 
-4. Configure your environment variables (see Configuration section)
+5. **Start the bot:**
+```bash
+# Development mode (with ts-node)
+npm run dev
 
-## Configuration
-
-Create a `.env` file with the following variables:
-
-### Required (for trading)
-```env
-PRIVATE_KEY=0xYourPrivateKeyHere
+# Or build and run
+npm run build
+npm start
 ```
 
-### Optional
-```env
-# API Endpoints
-CLOB_API_URL=https://clob.polymarket.com
-POLYGON_RPC_URL=https://polygon-rpc.com
-POLYGON_CHAIN_ID=137
-GAMMA_API_URL=https://gamma-api.polymarket.com
+On first launch, API credentials are automatically created/derived from your wallet.
 
-# WebSocket Endpoints
-SOFTWARE_WS_URL=ws://45.130.166.119:5001
-POLYMARKET_WS_URL=wss://ws-subscriptions-clob.polymarket.com/ws/market
+---
 
-# Trading Parameters
-PRICE_DIFFERENCE_THRESHOLD=0.015
-STOP_LOSS_AMOUNT=0.005
-TAKE_PROFIT_AMOUNT=0.01
-TRADE_COOLDOWN=30
-DEFAULT_TRADE_AMOUNT=5.0
+## ⚙️ Configuration Reference
 
-# Balance Requirements
-MIN_USDC_BALANCE=5.0
-MIN_MATIC_BALANCE=0.05
+| Variable              | Description                                    | Required |
+| --------------------- | ---------------------------------------------- | -------- |
+| `USER_ADDRESS`        | Target wallet address to copy trades from      | Yes      |
+| `PROXY_WALLET`        | Your wallet address that executes trades       | Yes      |
+| `PRIVATE_KEY`         | Your wallet private key (64 hex, no 0x)        | Yes      |
+| `CLOB_HTTP_URL`       | Polymarket CLOB HTTP API endpoint              | Yes      |
+| `CLOB_WS_URL`         | Polymarket WebSocket endpoint                  | Yes      |
+| `MONGO_URI`           | MongoDB connection string                      | Yes      |
+| `RPC_URL`             | Polygon RPC endpoint                           | Yes      |
+| `USDC_CONTRACT_ADDRESS` | USDC token contract on Polygon              | Yes      |
+| `FETCH_INTERVAL`      | Trade monitoring interval (seconds)             | No (default: 1) |
+| `TOO_OLD_TIMESTAMP`   | Ignore trades older than X hours                | No (default: 24) |
+| `RETRY_LIMIT`         | Maximum retry attempts for failed trades        | No (default: 3) |
 
-# Logging
-LOG_LEVEL=INFO
-LOG_TO_FILE=false
-
-# WebSocket Reconnection
-MAX_RECONNECT_ATTEMPTS=10
-BASE_RECONNECT_DELAY=5000
-MAX_RECONNECT_DELAY=60000
-```
+---
 
 ## Usage
 
-### Interactive Mode
+### Start Copy Trading
 
-Start the interactive trading bot:
 ```bash
 npm run dev
 ```
 
-The bot will display a menu with the following options:
+The bot will:
 
-**With Private Key (Full Mode):**
-1. Show Credentials
-2. Check Balances (USDC + MATIC)
-3. Check Allowance
-4. Set Allowance
-5. Find Current Bitcoin Market
-6. Get Price Data (Bid/Ask)
-7. Place Market Order
-8. Place Limit Order
-9. View Open Orders
-10. Cancel Order
-0. Exit
+1. Connect to MongoDB
+2. Initialize CLOB client and create/derive API keys
+3. Start trade monitor (fetches trades every X seconds)
+4. Start trade executor (processes pending trades)
+5. Monitor target wallet and execute copy trades automatically
 
-**Without Private Key (Read-Only Mode):**
-5. Find Current Bitcoin Market
-6. Get Price Data (Bid/Ask)
-0. Exit
+### Expected Output
 
-### Automated Trading
-
-Start the automated trading bot:
-```bash
-npm run auto-trade
+When running successfully, you should see:
+```
+MongoDB connected
+Target User Wallet address is: 0x...
+My Wallet address is: 0x...
+API Key created/derived
+Trade Monitor is running every 1 seconds
+Executing Copy Trading
+Waiting for new transactions...
 ```
 
-The automated bot will:
-- Connect to price feeds via WebSocket
-- Monitor price differences between software predictions and Polymarket
-- Execute trades when threshold is met
-- Automatically place stop-loss and take-profit orders
-- Monitor balances periodically
+### Trade Execution Flow
 
-### Utility Scripts
+1. **Monitor**: Fetches user activities from Polymarket API
+2. **Filter**: Identifies new TRADE type activities
+3. **Store**: Saves new trades to MongoDB
+4. **Execute**: Reads pending trades and determines action (buy/sell/merge)
+5. **Match**: Compares positions between target wallet and your wallet
+6. **Trade**: Executes orders via CLOB client
+7. **Update**: Marks trades as processed in database
 
-```bash
-# Check wallet balances
-npm run check-balance
+---
 
-# Generate API credentials
-npm run gen-creds
+## Execution Logic
 
-# Check/set token allowance
-npm run allowance
+### Trade Lifecycle
 
-# Get bid/ask prices for a token
-npm run bid-ask <token_id>
+1. **Fetch Activities**: Monitor target wallet via Polymarket Data API
+2. **Filter Trades**: Identify TRADE type activities only
+3. **Check Duplicates**: Verify trade hasn't been processed before
+4. **Validate Timestamp**: Ignore trades older than configured threshold
+5. **Save to Database**: Store new trades in MongoDB
+6. **Read Pending Trades**: Query database for unprocessed trades
+7. **Fetch Positions**: Get current positions for both wallets
+8. **Get Balances**: Check USDC balances for both wallets
+9. **Determine Condition**: Decide on buy/sell/merge based on positions
+10. **Execute Order**: Place order via CLOB client using appropriate strategy
+11. **Update Status**: Mark trade as processed in database
 
-# Find markets
-npm run market
+### Trading Strategies
 
-# Place orders (example usage)
-npm run order
-```
+* **Buy Strategy**: When target wallet buys, calculate position size based on balance ratio
+* **Sell Strategy**: When target wallet sells, match the sell proportionally
+* **Merge Strategy**: When target wallet closes position but you still hold, sell your position
+* **Error Handling**: Retry failed orders up to RETRY_LIMIT, then mark as failed
+
+---
 
 ## Project Structure
 
 ```
-confidential-spl-token/
-├── src/
-│   ├── main.ts                 # Interactive CLI bot
-│   ├── auto_trading_bot.ts    # Automated trading bot
-│   ├── generate_credentials.ts # CLOB API credential generator
-│   ├── credential_generator.ts # Credential utility
-│   ├── balance_checker.ts     # Balance checking
-│   ├── check_balance.ts       # Standalone balance checker
-│   ├── allowance.ts           # Token allowance management
-│   ├── bid_asker.ts           # Price data fetcher
-│   ├── market_finder.ts       # Market discovery
-│   ├── market_order.ts        # Order execution
-│   ├── logger.ts              # Logging utility
-│   └── config.ts              # Configuration management
-├── package.json
-├── tsconfig.json
-└── .env                        # Environment variables (not in repo)
+src/
+ ├── index.ts                 # Main entry point
+ ├── config/
+ │   ├── db.ts                # MongoDB connection
+ │   └── env.ts               # Environment variables
+ ├── services/
+ │   ├── tradeMonitor.ts      # Monitors target wallet trades
+ │   ├── tradeExecutor.ts     # Executes copy trades
+ │   └── createClobClient.ts # Alternative CLOB client (unused)
+ ├── utils/
+ │   ├── createClobClient.ts  # CLOB client initialization
+ │   ├── fetchData.ts         # HTTP data fetching
+ │   ├── getMyBalance.ts      # USDC balance checker
+ │   ├── postOrder.ts         # Order execution logic
+ │   └── spinner.ts           # Terminal spinner
+ ├── models/
+ │   └── userHistory.ts       # MongoDB schemas
+ ├── interfaces/
+ │   └── User.ts              # TypeScript interfaces
+ └── test/
+     └── test.ts              # Test utilities
 ```
 
-## Getting Started
+---
 
-### 1. Generate API Credentials
+##  Logging & Monitoring
 
-First, generate your Polymarket CLOB API credentials:
+* Trade detection and execution
+* Balance and allowance checks
+* Redemption outcomes
+* Structured logs for debugging and audits
+
+Log levels: `info`, `success`, `warning`, `error`
+
+---
+
+##  Risk Disclosure
+
+* Copy trading amplifies both profits and losses
+* Liquidity and slippage risks apply
+* Gas fees incurred on every transaction
+* WebSocket or API outages may impact execution
+
+**Best Practices**:
+
+* Start with low multipliers
+* Enforce strict max order sizes
+* Monitor balances regularly
+* Test using dry-run modes
+
+---
+
+## 🛠️ Development
+
 ```bash
-npm run gen-creds
-```
+# Type check
+npm run build
 
-This will create a `.credentials.json` file with your API keys.
-
-### 2. Check Your Balance
-
-Verify you have sufficient funds:
-```bash
-npm run check-balance
-```
-
-You need:
-- At least $5.00 USDC for trading
-- At least 0.05 MATIC for gas fees
-
-### 3. Set Token Allowance
-
-Before trading, approve USDC spending:
-```bash
-npm run allowance
-```
-
-Or use the interactive menu (option 4).
-
-### 4. Start Trading
-
-**Interactive Mode:**
-```bash
+# Run in development mode
 npm run dev
+
+# Lint code
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Format code
+npm run format
 ```
 
-**Automated Mode:**
-```bash
-npm run auto-trade
-```
+---
 
-## Security
+## Strategy Development Story
 
-⚠️ **IMPORTANT SECURITY NOTES:**
+This copy trading bot was developed as part of a comprehensive Polymarket trading strategy system. Development began in **December 2025**, focusing on automated trade execution and position management.
 
-1. **Never commit your `.env` file** - It contains your private key
-2. **Never commit `.credentials.json`** - It contains API keys
-3. **Keep your private key secure** - Anyone with access can control your wallet
-4. **Use a dedicated trading wallet** - Don't use your main wallet
-5. **Start with small amounts** - Test thoroughly before larger trades
-6. **Review all transactions** - Verify before confirming trades
+### Key Features
 
-The `.gitignore` file is configured to exclude sensitive files.
+* Real-time trade monitoring and execution
+* Intelligent position matching and sizing
+* Automatic retry mechanisms for failed orders
+* MongoDB-based trade history tracking
+* Support for multiple market types
 
-## Trading Strategy (Automated Bot)
+---
 
-The automated bot implements an arbitrage strategy:
+## Contact & Support
 
-1. **Price Monitoring**: Continuously monitors prices from:
-   - External software WebSocket feed
-   - Polymarket market data
+For deployment support, custom integrations, or professional inquiries:
 
-2. **Opportunity Detection**: Detects when price difference exceeds threshold
+**Telegram**: [@blacksky_jose](https://t.me/blacksky_jose)
 
-3. **Trade Execution**:
-   - Places market buy order
-   - Sets take-profit order (default: +$0.01)
-   - Sets stop-loss order (default: -$0.005)
-
-4. **Risk Management**:
-   - Cooldown between trades (default: 30 seconds)
-   - Balance monitoring
-   - Automatic reconnection on WebSocket failures
+---
 
 ## Troubleshooting
 
-### "Private key not provided"
-- Ensure `PRIVATE_KEY` is set in your `.env` file
-- Check that the private key starts with `0x`
+### Common Issues
 
-### "Insufficient funds"
-- Fund your wallet with USDC on Polygon
-- Ensure you have MATIC for gas fees
-- Use `npm run check-balance` to verify
+1. **"USER_ADDRESS is not defined"**
+   - Check your `.env` file exists and has all required variables
 
-### "RPC is not valid"
-- Check your internet connection
-- Verify `POLYGON_RPC_URL` is correct
-- Try a different RPC endpoint
+2. **"MongoDB connection error"**
+   - Ensure MongoDB is running
+   - Verify `MONGO_URI` is correct
 
-### WebSocket connection issues
-- Check firewall settings
-- Verify WebSocket URLs are correct
-- The bot will automatically retry with exponential backoff
+3. **"Cannot find module '@polymarket/clob-client'"**
+   - Run `npm install` to install dependencies
 
-### "Allowance insufficient"
-- Run `npm run allowance` to set allowance
-- Or use the interactive menu (option 4)
-- You can set "max" for unlimited allowance
+4. **"invalid hexlify value"**
+   - Check `PRIVATE_KEY` is 64 hex characters without `0x` prefix
 
-## Development
+5. **"API Key creation failed"**
+   - Verify `PRIVATE_KEY` matches `PROXY_WALLET`
+   - Ensure wallet has proper permissions
 
-### Build
-```bash
-npm run build
-```
+### Testing
 
-### Run compiled version
-```bash
-npm start
-```
+Before running in production:
+1. Monitor first few trades carefully
+2. Verify MongoDB is storing trades correctly
+3. Check order execution logs
 
-### TypeScript Configuration
-The project uses TypeScript with strict mode enabled. Configuration is in `tsconfig.json`.
-
-## Dependencies
-
-- `@polymarket/clob-client` - Polymarket CLOB API client
-- `ethers` / `@ethersproject/*` - Blockchain interaction
-- `axios` - HTTP requests
-- `ws` - WebSocket connections
-- `dotenv` - Environment variable management
+---
 
 ## License
 
 ISC
 
-## Disclaimer
-
-This software is provided as-is for educational and research purposes. Trading cryptocurrencies and prediction markets involves substantial risk. Always:
-
-- Test thoroughly with small amounts
-- Understand the risks involved
-- Never trade more than you can afford to lose
-- Review all code before using with real funds
-- Use at your own risk
-
-The authors are not responsible for any losses incurred from using this software.
-
-## Support
-
-For issues, questions, or contributions, please open an issue on the repository.
-
 ---
 
-**Happy Trading! 🚀**
-
+**Disclaimer**: This software is provided as-is without warranties. Trading prediction markets involves substantial risk. Use responsibly and only with capital you can afford to lose. Past performance does not guarantee future results.
