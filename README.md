@@ -41,13 +41,7 @@ Selected profit-and-loss snapshots from live trading sessions:
 
 <img width="352" height="222" src="https://github.com/user-attachments/assets/294c51f5-d531-450c-904c-9c19e0184a23" />
 <img width="290" height="201" src="https://github.com/user-attachments/assets/2b7633a6-d9f1-43f2-a14d-ba79f9c147b2" />
-<img width="351" height="223" src="https://github.com/user-attachments/assets/7b7ad783-98b5-4b10-a0a7-166e90f56589" />
-<img width="313" height="202" src="https://github.com/user-attachments/assets/3b58db58-66e0-43f7-922f-8c220e37cd4c" />
-<img width="432" height="256" src="https://github.com/user-attachments/assets/638f3ea4-050d-49c3-adad-f6e6c663af23" />
-<img width="381" height="246" src="https://github.com/user-attachments/assets/29167026-508c-4f33-a1cd-a1a852b9d5cb" />
-<img width="409" height="227" src="https://github.com/user-attachments/assets/c707ae12-cf65-4a94-8d63-7e79b0c22a59" />
-<img width="358" height="225" src="https://github.com/user-attachments/assets/e30fa92d-04fb-498f-83af-db87448bf5c3" />
-<img width="410" height="262" src="https://github.com/user-attachments/assets/eff306c8-1e4e-4055-9bda-6bcdae33566d" />
+<img width="351" height="223" src="https://github.com/user-attachments/assets/7b7ad783-98b5-4b10-a0a7-166e90f56589" />\
 <img width="442" height="257" src="https://github.com/user-attachments/assets/92674dca-76e8-4591-8b4b-54a7c5d4c39b" />
 
 
