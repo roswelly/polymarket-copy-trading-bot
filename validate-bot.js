@@ -132,7 +132,7 @@ if (fs.existsSync('.env')) {
         console.log('  ⚠️  Could not read .env file');
     }
 } else {
-    console.log('  ⚠️  .env file not found - create one from .env.example');
+    console.log('  ⚠️  .env file not found - create one from env.example');
 }
 
 // Summary

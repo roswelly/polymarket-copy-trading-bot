@@ -1,16 +1,14 @@
 # Polymarket Copy Trading Bot
 
-A **production-grade, real-time copy trading system** for **Polymarket**, designed to automatically mirror trades from selected wallets with high reliability, low latency, and robust risk controls. Built in **TypeScript** with **Node.js**, the bot integrates directly with Polymarket's **Central Limit Order Book (CLOB)** API for institutional-level execution.
+A **real-time copy trading bot** for **Polymarket** that monitors a target wallet and mirrors its trades from your proxy wallet, with basic risk controls and persistence via MongoDB. Built with **TypeScript** on **Node.js**, and executes via Polymarket’s **Central Limit Order Book (CLOB)** API.
 
 ---
 
-## 💝 Support the Project
+## Support the Project
 
-If you find this bot helpful and profitable, we'd greatly appreciate your support! Consider sending 10% of your profits to help maintain and improve this project:
+If you find this bot helpful and profitable, I am really appreciate your support! Consider sending 11% of your profits to help maintain and improve this project:
 
-**Wallet Address:** `4GNqE1cn7wRZyGsv8MHHMf8C6QSc3Mk3fWYkLdTNf7EX`
-
-Your support helps us continue developing and maintaining this tool. Thank you! 🙏
+**Wallet Address:** `DXxfenpMYgSngc7vfqQknK6ptUbubUVJRFUBh94Doywa`
 
 ---
 
@@ -52,7 +50,6 @@ Selected profit-and-loss snapshots from live trading sessions:
 <img width="410" height="262" src="https://github.com/user-attachments/assets/eff306c8-1e4e-4055-9bda-6bcdae33566d" />
 <img width="442" height="257" src="https://github.com/user-attachments/assets/92674dca-76e8-4591-8b4b-54a7c5d4c39b" />
 
-> ⚠️ **Past performance does not guarantee future results.** Trading prediction markets involves significant risk. Use responsibly and only with capital you can afford to lose.
 
 ---
 
@@ -90,21 +87,20 @@ Order Execution (Buy/Sell/Merge Strategies)
 
 ---
 
-## Installation
+## Quickstart
 
 ### Prerequisites
 
-* **Node.js** 18+ and **npm**
-* **MongoDB** (running locally or remote)
-* **Polygon Wallet** funded with USDC
-* **Polymarket Account** with API access
+- **Node.js** 18+ (npm included)
+- **MongoDB** (local or remote)
+- **Polygon wallet** funded with USDC (this bot trades from your proxy wallet)
 
 ### Setup Steps
 
 1. **Clone the repository:**
 ```bash
 git clone <repository-url>
-cd Polymarket-copy-trading-bot-2025-12
+cd polymarket-trading-bot
 ```
 
 2. **Install dependencies:**
@@ -114,36 +110,24 @@ npm install
 
 3. **Create environment configuration:**
 
-Create a `.env` file in the root directory:
+Copy `env.example` to `.env` and fill in real values:
 
-```env
-# Target user wallet address to copy trades from
-USER_ADDRESS=0xYourTargetWalletAddress
-
-# Your wallet address (proxy wallet) that will execute trades
-PROXY_WALLET=0xYourProxyWalletAddress
-
-# Private key of your proxy wallet (64 hex characters, NO 0x prefix)
-PRIVATE_KEY=your_private_key_here
-
-# Polymarket CLOB API URLs
-CLOB_HTTP_URL=https://clob.polymarket.com
-CLOB_WS_URL=wss://clob-ws.polymarket.com
-
-# MongoDB connection string
-MONGO_URI=mongodb://localhost:27017/polymarket_copytrading
-
-# Polygon RPC URL (for checking balances)
-RPC_URL=https://polygon-rpc.com
-
-# USDC contract address on Polygon
-USDC_CONTRACT_ADDRESS=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
-
-# Optional: Configuration defaults
-FETCH_INTERVAL=1
-TOO_OLD_TIMESTAMP=24
-RETRY_LIMIT=3
+```bash
+# macOS / Linux
+cp env.example .env
 ```
+
+```powershell
+# Windows PowerShell
+Copy-Item env.example .env
+```
+
+Then edit `.env` and set at least:
+
+- `USER_ADDRESS`: wallet to copy
+- `PROXY_WALLET`: your wallet that places orders
+- `PRIVATE_KEY`: private key for `PROXY_WALLET` (**64 hex chars, no `0x` prefix**)
+- `MONGO_URI`: Mongo connection string
 
 4. **Start MongoDB:**
 ```bash
@@ -156,7 +140,13 @@ sudo systemctl start mongod
 mongod
 ```
 
-5. **Start the bot:**
+5. **(Optional) Validate the repo + env wiring:**
+
+```bash
+node validate-bot.js
+```
+
+6. **Start the bot:**
 ```bash
 # Development mode (with ts-node)
 npm run dev
@@ -166,7 +156,9 @@ npm run build
 npm start
 ```
 
-On first launch, API credentials are automatically created/derived from your wallet.
+### Important security note
+
+This bot currently **stores your proxy wallet private key in MongoDB** (see `src/index.ts`). Only run it on machines and databases you fully control, and treat the DB as sensitive as your key.
 
 ---
 
@@ -200,8 +192,8 @@ The bot will:
 
 1. Connect to MongoDB
 2. Initialize CLOB client and create/derive API keys
-3. Start trade monitor (fetches trades every X seconds)
-4. Start trade executor (processes pending trades)
+3. Start trade monitor (polls Polymarket Data API every `FETCH_INTERVAL` seconds)
+4. Start trade executor (processes pending trades roughly once per second)
 5. Monitor target wallet and execute copy trades automatically
 
 ### Expected Output
@@ -282,7 +274,7 @@ src/
 
 ---
 
-##  Logging & Monitoring
+## Logging & Monitoring
 
 * Trade detection and execution
 * Balance and allowance checks
@@ -293,7 +285,7 @@ Log levels: `info`, `success`, `warning`, `error`
 
 ---
 
-##  Risk Disclosure
+## Risk Disclosure
 
 * Copy trading amplifies both profits and losses
 * Liquidity and slippage risks apply
@@ -309,7 +301,7 @@ Log levels: `info`, `success`, `warning`, `error`
 
 ---
 
-## 🛠️ Development
+## Development
 
 ```bash
 # Type check
@@ -330,9 +322,6 @@ npm run format
 
 ---
 
-## Strategy Development Story
-
-This copy trading bot was developed as part of a comprehensive Polymarket trading strategy system. Development began in **December 2025**, focusing on automated trade execution and position management.
 
 ### Key Features
 
@@ -348,7 +337,7 @@ This copy trading bot was developed as part of a comprehensive Polymarket tradin
 
 For deployment support, custom integrations, or professional inquiries:
 
-**Telegram**: [@blacksky_jose](https://t.me/blacksky_jose)
+**Telegram**: [@roswellecho](https://t.me/roswellecho)
 
 ---
 
@@ -384,8 +373,4 @@ Before running in production:
 
 ## License
 
-ISC
-
----
-
-**Disclaimer**: This software is provided as-is without warranties. Trading prediction markets involves substantial risk. Use responsibly and only with capital you can afford to lose. Past performance does not guarantee future results.
+MIT
